@@ -442,7 +442,7 @@ if st.sidebar.button("Request Forecast"):
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
             # Train all models
-            with st.spinner("Training models..."):
+            with st.spinner("Training models...(Might take 3-5 minutes)"):
                 arima_forecast, arima_model = train_arima(train, test, test_len)
                 lstm_forecast, lstm_model = train_lstm(train, test, test_len)
                 naive_forecast, naive_model = train_naive(train, test, test_len)
@@ -488,10 +488,11 @@ if st.sidebar.button("Request Forecast"):
             # Function to Generate Forecast and Confidence Intervals
             def get_forecast_and_confidence(model_name, forecast_horizon):
                 if model_name == "ARIMA":
-                    forecast = arima_model.predict(n_periods=forecast_horizon)
+                    forecast = arima_model.predict(n_periods=forecast_horizon)  
                     conf_int = arima_model.conf_int(alpha=0.05)  # Confidence interval for ARIMA
                     return forecast, conf_int
                 elif model_name == "LSTM":
+                    
                     forecast = lstm_forecast[:forecast_horizon]
                     return forecast, None  # No confidence intervals for LSTM
                 elif model_name == "Naive":
@@ -505,7 +506,6 @@ if st.sidebar.button("Request Forecast"):
 
             # Generate Forecast and Confidence Intervals
             forecast, conf_int = get_forecast_and_confidence(best_model, forecast_horizon)
-
             # Plot Historical Data, Forecast, and Confidence Intervals
             fig, ax = plt.subplots(figsize=(14, 7))
             ax.plot(data, label='Historical Data', color='blue', linewidth=2)
@@ -514,7 +514,7 @@ if st.sidebar.button("Request Forecast"):
             # Add Confidence Interval for ARIMA
             if best_model == "ARIMA" and conf_int is not None:
                 conf_int = np.array(conf_int)
-                ax.fill_between(forecast_period, conf_int[:, 0], conf_int[:, 1], color='pink', alpha=0.3, label="95% Confidence Interval")
+                #ax.fill_between(forecast_period, conf_int[:, 0], conf_int[:, 1], color='pink', alpha=0.3, label="95% Confidence Interval")
 
             # Customize Plot
             ax.set_title(f"{forecast_type} {best_model} Forecast with Confidence Interval", fontsize=16)
@@ -534,9 +534,9 @@ if st.sidebar.button("Request Forecast"):
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------#
             # If ARIMA has confidence intervals, add them to the dataframe
-            if best_model == "ARIMA" and conf_int is not None:
-                forecast_df["Lower Bound (95%)"] = conf_int[:, 0]
-                forecast_df["Upper Bound (95%)"] = conf_int[:, 1]
+            #if best_model == "ARIMA" and conf_int is not None:
+               # forecast_df["Lower Bound (95%)"] = conf_int[:, 0]
+              #  forecast_df["Upper Bound (95%)"] = conf_int[:, 1]
 
             # Display the forecasted values table
             st.markdown(f"<h4>{forecast_type} Forecasted Values</h4>", unsafe_allow_html=True)
@@ -552,7 +552,7 @@ if st.sidebar.button("Request Forecast"):
             ax.plot(forecast_index, forecast, label='Forecast', color='red')
             if best_model == "ARIMA":
                 conf_int = arima_model.conf_int(alpha=0.05)
-                ax.fill_between(forecast_index, conf_int[:, 0], conf_int[:, 1], color='pink', alpha=0.3)
+                #ax.fill_between(forecast_index, conf_int[:, 0], conf_int[:, 1], color='pink', alpha=0.3)
             ax.legend()
             st.pyplot(fig)
 
